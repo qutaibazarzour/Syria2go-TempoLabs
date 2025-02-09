@@ -32,7 +32,9 @@ const SearchDialog = ({ isOpen, onClose, onSearch }: SearchDialogProps) => {
   const [dates, setDates] = useState<DateRange>();
   const [numberOfMonths, setNumberOfMonths] = useState(1);
   const [startDate, setStartDate] = useState<Date>();
-  const [dateMode, setDateMode] = useState<"dates" | "months">("dates");
+  const [dateMode, setDateMode] = useState<"daily" | "monthly" | "yearly">(
+    "daily",
+  );
   const [guests, setGuests] = useState({
     adults: 1,
     children: 0,
@@ -55,17 +57,23 @@ const SearchDialog = ({ isOpen, onClose, onSearch }: SearchDialogProps) => {
   const handleNext = () => {
     if (step === "location") setStep("dates");
     else if (step === "dates") {
-      if (dateMode === "dates" && (!dates?.from || !dates?.to)) return;
-      if (dateMode === "months" && !startDate) return;
+      if (dateMode === "daily" && (!dates?.from || !dates?.to)) return;
+      if ((dateMode === "monthly" || dateMode === "yearly") && !startDate)
+        return;
       setStep("guests");
     } else if (step === "guests") {
       const finalDates =
-        dateMode === "months" && startDate
+        dateMode === "monthly" && startDate
           ? {
               from: startDate,
               to: addMonths(startDate, numberOfMonths),
             }
-          : dates;
+          : dateMode === "yearly" && startDate
+            ? {
+                from: startDate,
+                to: addMonths(startDate, 12),
+              }
+            : dates;
       onSearch({
         location,
         dates: finalDates,
@@ -77,9 +85,15 @@ const SearchDialog = ({ isOpen, onClose, onSearch }: SearchDialogProps) => {
 
   const renderStepIndicator = () => {
     const getDateDisplay = () => {
-      if (dateMode === "months" && startDate) {
+      if (dateMode === "monthly" && startDate) {
         return `${format(startDate, "MMM d")} - ${format(
           addMonths(startDate, numberOfMonths),
+          "MMM d",
+        )}`;
+      }
+      if (dateMode === "yearly" && startDate) {
+        return `${format(startDate, "MMM d")} - ${format(
+          addMonths(startDate, 12),
           "MMM d",
         )}`;
       }
@@ -222,20 +236,20 @@ const SearchDialog = ({ isOpen, onClose, onSearch }: SearchDialogProps) => {
         When's your trip?
       </h1>
 
-      <Tabs defaultValue="dates" className="w-full">
+      <Tabs defaultValue="daily" className="w-full">
         <TabsList className="grid w-full grid-cols-3 mb-6 p-1 bg-muted/10">
-          <TabsTrigger value="dates" onClick={() => setDateMode("dates")}>
-            Dates
+          <TabsTrigger value="daily" onClick={() => setDateMode("daily")}>
+            Daily
           </TabsTrigger>
-          <TabsTrigger value="months" onClick={() => setDateMode("months")}>
-            Months
+          <TabsTrigger value="monthly" onClick={() => setDateMode("monthly")}>
+            Monthly
           </TabsTrigger>
-          <TabsTrigger value="flexible" disabled>
-            Flexible
+          <TabsTrigger value="yearly" onClick={() => setDateMode("yearly")}>
+            Yearly
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="dates" className="mt-0">
+        <TabsContent value="daily" className="mt-0">
           <div className="relative">
             <div className="sticky top-0 z-10 bg-white border-b">
               <div className="grid grid-cols-7 py-2">
@@ -286,7 +300,7 @@ const SearchDialog = ({ isOpen, onClose, onSearch }: SearchDialogProps) => {
           </div>
         </TabsContent>
 
-        <TabsContent value="months" className="mt-0">
+        <TabsContent value="monthly" className="mt-0">
           <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg gap-4 sm:gap-0">
               <div>
@@ -364,6 +378,58 @@ const SearchDialog = ({ isOpen, onClose, onSearch }: SearchDialogProps) => {
                       addMonths(startDate, numberOfMonths),
                       "MMM d, yyyy",
                     )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="yearly" className="mt-0">
+          <div className="space-y-6">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Move-in date</label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal h-12",
+                        !startDate && "text-muted-foreground",
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {startDate
+                        ? format(startDate, "dd.MM.yyyy")
+                        : "Pick a date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    className="w-auto p-0"
+                    align="start"
+                    sideOffset={8}
+                  >
+                    <Calendar
+                      mode="single"
+                      selected={startDate}
+                      onSelect={setStartDate}
+                      disabled={(date) => isBefore(date, startOfToday())}
+                      initialFocus
+                      showOutsideDays={false}
+                      fixedWeeks
+                      ISOWeek
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              {startDate && (
+                <div className="p-4 border rounded-lg bg-muted/50">
+                  <div className="font-medium">Your yearly contract</div>
+                  <div className="text-sm text-muted-foreground mt-1">
+                    From {format(startDate, "MMM d, yyyy")} to{" "}
+                    {format(addMonths(startDate, 12), "MMM d, yyyy")}
                   </div>
                 </div>
               )}
