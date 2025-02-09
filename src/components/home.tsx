@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Header from "./Header";
+import MobileNav from "./MobileNav";
 
 import PropertyGrid from "./PropertyGrid";
 import MapView from "./MapView";
@@ -62,8 +63,9 @@ const Home = ({ initialView = "grid" }: HomeProps) => {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white pb-16 md:pb-0">
       <Header />
+      <MobileNav />
 
       {/* View Toggle */}
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">

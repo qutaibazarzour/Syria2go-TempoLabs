@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Dialog, DialogContent } from "./ui/dialog";
+import { DialogCloseButton } from "./ui/dialog-close-button";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Calendar as CalendarIcon } from "lucide-react";
@@ -339,6 +340,7 @@ const SearchDialog = ({ isOpen, onClose, onSearch }: SearchDialogProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[600px] p-0 h-[100vh] sm:h-[85vh] flex flex-col overflow-hidden max-w-full">
+        <DialogCloseButton />
         {/* Fixed Header */}
         <div className="flex-none p-4 border-b">
           <div className="flex justify-between items-center">

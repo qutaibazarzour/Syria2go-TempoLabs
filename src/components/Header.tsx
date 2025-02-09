@@ -41,38 +41,19 @@ const Header = ({
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white">
       <div className="container mx-auto h-20 flex items-center justify-between gap-4 px-6">
-        {/* Logo */}
-        <div className="flex-none">
+        {/* Logo - Hidden on mobile */}
+        <div className="flex-none hidden md:block">
           <h1 className="text-2xl font-bold text-primary">RentalSpace</h1>
         </div>
 
         {/* Search Bar */}
-        <div className="flex-1 max-w-2xl">
+        <div className="flex-1 md:flex-none md:w-[480px]">
           <SearchBar onSearch={() => onSearch("")} className="w-full" />
         </div>
 
-        {/* Navigation */}
-        <div className="flex items-center gap-4">
-          <NavigationMenu className="hidden md:block">
-            <NavigationMenuList>
-              <NavigationMenuItem>
-                <NavigationMenuTrigger>Explore</NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <div className="grid gap-3 p-4 w-[400px]">
-                    <NavigationMenuLink className="cursor-pointer">
-                      Featured Properties
-                    </NavigationMenuLink>
-                    <NavigationMenuLink className="cursor-pointer">
-                      New Listings
-                    </NavigationMenuLink>
-                    <NavigationMenuLink className="cursor-pointer">
-                      Popular Destinations
-                    </NavigationMenuLink>
-                  </div>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-          </NavigationMenu>
+        {/* Navigation - Hidden on mobile */}
+        <div className="hidden md:flex items-center gap-4">
+          <Button variant="ghost">Become a host</Button>
 
           {isLoggedIn ? (
             <DropdownMenu>
@@ -111,10 +92,6 @@ const Header = ({
               <Button onClick={onSignup}>Sign up</Button>
             </div>
           )}
-
-          <Button variant="ghost" size="icon" className="md:hidden">
-            <Menu className="h-5 w-5" />
-          </Button>
         </div>
       </div>
     </header>
