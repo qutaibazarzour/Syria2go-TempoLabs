@@ -33,12 +33,22 @@ const SearchDialog = ({ isOpen, onClose, onSearch }: SearchDialogProps) => {
   const [numberOfMonths, setNumberOfMonths] = useState(1);
   const [startDate, setStartDate] = useState<Date>();
   const [dateMode, setDateMode] = useState<"dates" | "months">("dates");
-  const [guests, setGuests] = useState(1);
+  const [guests, setGuests] = useState({
+    adults: 1,
+    children: 0,
+    infants: 0,
+    pets: 0,
+  });
 
   const handleClearAll = () => {
     setLocation("");
     setDates(undefined);
-    setGuests(1);
+    setGuests({
+      adults: 1,
+      children: 0,
+      infants: 0,
+      pets: 0,
+    });
     setStep("location");
   };
 
@@ -56,7 +66,11 @@ const SearchDialog = ({ isOpen, onClose, onSearch }: SearchDialogProps) => {
               to: addMonths(startDate, numberOfMonths),
             }
           : dates;
-      onSearch({ location, dates: finalDates, guests });
+      onSearch({
+        location,
+        dates: finalDates,
+        guests: guests.adults + guests.children,
+      });
       onClose();
     }
   };
@@ -360,34 +374,86 @@ const SearchDialog = ({ isOpen, onClose, onSearch }: SearchDialogProps) => {
     </div>
   );
 
-  const renderGuestsStep = () => (
-    <div className="p-4 sm:p-6">
-      <h1 className="text-2xl sm:text-3xl font-semibold mb-4 sm:mb-6">
-        Who's coming?
-      </h1>
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg gap-4 sm:gap-0">
+  const renderGuestsStep = () => {
+    const GuestCounter = ({
+      title,
+      description,
+      value,
+      onChange,
+      min = 0,
+      max = 16,
+    }: {
+      title: string;
+      description: string;
+      value: number;
+      onChange: (value: number) => void;
+      min?: number;
+      max?: number;
+    }) => (
+      <div className="flex items-center justify-between px-6 py-4">
         <div>
-          <div className="font-medium">Guests</div>
-          <div className="text-sm text-gray-500">Add guests</div>
+          <div className="font-medium">{title}</div>
+          <div className="text-sm text-gray-500">{description}</div>
         </div>
-        <div className="flex items-center gap-4 self-center sm:self-auto">
+        <div className="flex items-center gap-4">
           <Button
             variant="outline"
-            onClick={() => setGuests(Math.max(1, guests - 1))}
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => onChange(Math.max(min, value - 1))}
+            disabled={value <= min}
           >
             -
           </Button>
-          <span className="text-xl font-medium w-8 text-center">{guests}</span>
+          <span className="w-6 text-center">{value}</span>
           <Button
             variant="outline"
-            onClick={() => setGuests(Math.min(16, guests + 1))}
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => onChange(Math.min(max, value + 1))}
+            disabled={value >= max}
           >
             +
           </Button>
         </div>
       </div>
-    </div>
-  );
+    );
+
+    return (
+      <div className="p-4 sm:p-6">
+        <h1 className="text-2xl sm:text-3xl font-semibold mb-4 sm:mb-6">
+          Who's coming?
+        </h1>
+        <div className="border rounded-lg divide-y">
+          <GuestCounter
+            title="Adults"
+            description="Ages 13 or above"
+            value={guests.adults}
+            onChange={(value) => setGuests({ ...guests, adults: value })}
+            min={1}
+          />
+          <GuestCounter
+            title="Children"
+            description="Ages 2-12"
+            value={guests.children}
+            onChange={(value) => setGuests({ ...guests, children: value })}
+          />
+          <GuestCounter
+            title="Infants"
+            description="Under 2"
+            value={guests.infants}
+            onChange={(value) => setGuests({ ...guests, infants: value })}
+          />
+          <GuestCounter
+            title="Pets"
+            description="Bringing any pets?"
+            value={guests.pets}
+            onChange={(value) => setGuests({ ...guests, pets: value })}
+          />
+        </div>
+      </div>
+    );
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

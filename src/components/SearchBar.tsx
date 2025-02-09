@@ -35,7 +35,9 @@ const SearchBar = ({ onSearch = () => {}, className }: SearchBarProps) => {
         </div>
         <div className="h-full w-[1px] bg-gray-200" />
         <div className="flex items-center pl-6 pr-2 hover:bg-gray-50 rounded-r-full transition-colors">
-          <span className="text-sm text-gray-600">Add guests</span>
+          <span className="text-sm text-gray-600">
+            <span className="hidden sm:inline">Add </span>guests
+          </span>
           <Button
             size="icon"
             className="ml-4 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 h-8 w-8"
