@@ -31,7 +31,7 @@ const SearchBar = ({ onSearch = () => {}, className }: SearchBarProps) => {
         </div>
         <div className="h-full w-[1px] bg-gray-200" />
         <div className="flex flex-1 items-center px-6 hover:bg-gray-50 transition-colors">
-          <span className="text-sm font-medium">Any week</span>
+          <span className="text-sm font-medium">Anytime</span>
         </div>
         <div className="h-full w-[1px] bg-gray-200" />
         <div className="flex items-center pl-6 pr-2 hover:bg-gray-50 rounded-r-full transition-colors">

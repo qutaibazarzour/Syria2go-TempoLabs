@@ -126,26 +126,78 @@ const SearchDialog = ({ isOpen, onClose, onSearch }: SearchDialogProps) => {
       </div>
 
       <div className="mt-6 space-y-4">
-        {["Damascus, Syria", "Aleppo, Syria", "Latakia, Syria"].map(
-          (suggestion, index) => (
-            <button
-              key={index}
-              className="w-full flex items-center gap-4 p-4 hover:bg-gray-100 rounded-lg transition-colors"
-              onClick={() => {
-                setLocation(suggestion);
-                setStep("dates");
-              }}
-            >
-              <div className="h-12 w-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                <div className="h-6 w-6 text-gray-600">📍</div>
+        {[
+          {
+            name: "Damascus, Syria",
+            type: "Popular",
+            description: "Capital City",
+          },
+          {
+            name: "Aleppo, Syria",
+            type: "Historic",
+            description: "Ancient City",
+          },
+          {
+            name: "Latakia, Syria",
+            type: "Coastal",
+            description: "Mediterranean Port",
+          },
+          {
+            name: "Homs, Syria",
+            type: "Central",
+            description: "Historic Center",
+          },
+          { name: "Tartus, Syria", type: "Coastal", description: "Beach City" },
+          {
+            name: "Palmyra, Syria",
+            type: "Historic",
+            description: "Ancient Ruins",
+          },
+          {
+            name: "Hama, Syria",
+            type: "Historic",
+            description: "Water Wheels City",
+          },
+          {
+            name: "Al-Hasakah, Syria",
+            type: "Eastern",
+            description: "Agricultural Hub",
+          },
+          {
+            name: "Deir ez-Zor, Syria",
+            type: "Eastern",
+            description: "Euphrates City",
+          },
+          {
+            name: "Raqqa, Syria",
+            type: "Northern",
+            description: "Historic Site",
+          },
+          {
+            name: "Idlib, Syria",
+            type: "Northwestern",
+            description: "Ancient City",
+          },
+        ].map((suggestion, index) => (
+          <button
+            key={index}
+            className="w-full flex items-center gap-4 p-4 hover:bg-gray-100 rounded-lg transition-colors"
+            onClick={() => {
+              setLocation(suggestion.name);
+              setStep("dates");
+            }}
+          >
+            <div className="h-12 w-12 bg-gray-50 rounded-lg flex items-center justify-center">
+              <div className="text-2xl">📍</div>
+            </div>
+            <div className="text-left">
+              <div className="font-semibold">{suggestion.name}</div>
+              <div className="text-gray-500 text-sm">
+                {suggestion.description}
               </div>
-              <div className="text-left">
-                <div className="font-semibold">{suggestion}</div>
-                <div className="text-gray-500 text-sm">City</div>
-              </div>
-            </button>
-          ),
-        )}
+            </div>
+          </button>
+        ))}
       </div>
     </div>
   );
@@ -339,12 +391,12 @@ const SearchDialog = ({ isOpen, onClose, onSearch }: SearchDialogProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] p-0 h-[100vh] sm:h-[85vh] flex flex-col overflow-hidden max-w-full">
-        <DialogCloseButton />
+      <DialogContent className="sm:max-w-[600px] p-0 sm:h-[85vh] flex flex-col overflow-hidden max-w-full h-[100dvh] sm:h-[85vh]">
         {/* Fixed Header */}
-        <div className="flex-none p-4 border-b">
+        <div className="flex-none p-4 border-b sticky top-0 bg-background z-10">
           <div className="flex justify-between items-center">
             <h2 className="text-lg font-semibold">Search</h2>
+            <DialogCloseButton />
           </div>
         </div>
 
@@ -354,8 +406,8 @@ const SearchDialog = ({ isOpen, onClose, onSearch }: SearchDialogProps) => {
         )}
 
         {/* Scrollable Content */}
-        <ScrollArea className="flex-1 min-h-0">
-          <div className="h-full">
+        <ScrollArea className="flex-1 overflow-y-auto">
+          <div>
             {step === "location" && renderLocationStep()}
             {step === "dates" && renderDatesStep()}
             {step === "guests" && renderGuestsStep()}
@@ -363,7 +415,7 @@ const SearchDialog = ({ isOpen, onClose, onSearch }: SearchDialogProps) => {
         </ScrollArea>
 
         {/* Fixed Footer */}
-        <div className="flex-none p-4 border-t flex flex-col sm:flex-row gap-2 sm:gap-0 justify-between">
+        <div className="flex-none p-4 border-t flex flex-col sm:flex-row gap-2 sm:gap-0 justify-between sticky bottom-0 bg-background z-10">
           <Button
             variant="ghost"
             onClick={handleClearAll}
