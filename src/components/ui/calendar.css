@@ -9,103 +9,81 @@
   margin: 0;
 }
 
-.calendar-container {
-  position: relative;
-  width: 100%;
-  height: calc(100vh - 400px);
-  min-height: 400px;
-  background: white;
-  overflow: hidden;
-}
-
-.calendar-days-header {
-  position: sticky;
-  top: 0;
-  z-index: 40;
-  background: white;
-  border-bottom: 1px solid hsl(var(--border));
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  width: 100%;
-  padding: 0.75rem 0;
-}
-
-.calendar-days-header .day-label {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: hsl(var(--muted-foreground));
-  text-align: center;
-}
-
-.calendar-scroll {
-  height: calc(100% - 48px);
-  overflow-y: auto;
-  padding: 1rem;
-}
-
+/* Month Layout */
 .rdp-months {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2rem !important;
+  width: 100% !important;
 }
 
 .rdp-month {
-  width: 100%;
+  width: 100% !important;
+  margin: 0 !important;
 }
 
+/* Month Header */
+.rdp-caption {
+  text-align: left !important;
+  padding: 0 !important;
+  margin-bottom: 1rem !important;
+}
+
+.rdp-caption_label {
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Hide Navigation and Default Header */
+.rdp-nav,
+.rdp-head {
+  display: none !important;
+}
+
+/* Calendar Grid */
 .rdp-table {
-  width: 100%;
+  width: 100% !important;
   border-collapse: separate;
   border-spacing: 0;
 }
 
-.rdp-head {
-  display: none;
-}
-
-.rdp-caption {
-  text-align: left;
-  padding: 0;
-  margin-bottom: 1rem;
-}
-
-.rdp-caption_label {
-  font-size: 1rem;
-  font-weight: 600;
-  color: hsl(var(--foreground));
-}
-
-.rdp-nav {
-  display: none;
+.rdp-tbody {
+  width: 100% !important;
 }
 
 .rdp-cell {
-  text-align: center;
-  padding: 0;
+  text-align: center !important;
+  padding: 0 !important;
+  height: 40px !important;
+  width: calc(100% / 7) !important;
 }
 
+/* Day Styling */
 .rdp-day {
-  width: 100%;
-  aspect-ratio: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.875rem;
-  font-weight: 500;
-  transition: all 0.2s;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  transition: all 0.2s !important;
 }
 
+/* Selected Day States */
 .rdp-day_selected,
 .rdp-day_selected:focus-visible,
 .rdp-day_selected:hover {
-  color: white;
-  opacity: 1;
-  background-color: var(--rdp-accent-color);
+  color: white !important;
+  opacity: 1 !important;
+  background-color: var(--rdp-accent-color) !important;
 }
 
 .rdp-day_range_start,
 .rdp-day_range_end {
-  border-radius: 50%;
+  border-radius: 50% !important;
 }
 
 .rdp-day_range_middle {
@@ -113,43 +91,37 @@
   color: hsl(var(--primary)) !important;
 }
 
+/* Hover States */
 .rdp-button:hover:not([disabled]):not(.rdp-day_selected) {
-  background-color: hsl(var(--primary) / 0.1);
-  color: hsl(var(--primary));
+  background-color: hsl(var(--primary) / 0.1) !important;
+  color: hsl(var(--primary)) !important;
 }
 
+/* Special States */
 .rdp-day_today:not(.rdp-day_outside):not(.rdp-day_selected) {
-  border: 1px solid hsl(var(--primary) / 0.5);
-  color: hsl(var(--primary));
+  border: 1px solid hsl(var(--primary) / 0.5) !important;
+  color: hsl(var(--primary)) !important;
 }
 
 .rdp-day_outside {
-  opacity: 0.5;
+  opacity: 0.5 !important;
 }
 
 .rdp-day_disabled {
-  opacity: 0.25;
+  opacity: 0.25 !important;
 }
 
+/* Responsive Adjustments */
 @media (max-width: 640px) {
-  .calendar-container {
-    height: calc(100vh - 350px);
-    min-height: 350px;
-  }
-
-  .calendar-days-header {
-    padding: 0.5rem 0;
-  }
-
-  .calendar-scroll {
-    padding: 0.5rem;
-  }
-
   .rdp-months {
-    gap: 1.5rem;
+    gap: 1.5rem !important;
   }
 
   .rdp-caption_label {
-    font-size: 0.875rem;
+    font-size: 0.875rem !important;
+  }
+
+  .rdp-cell {
+    height: 35px !important;
   }
 }

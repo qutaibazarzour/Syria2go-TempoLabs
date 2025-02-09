@@ -4,6 +4,7 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { Calendar } from "./ui/calendar";
+import { VerticalCalendar } from "./ui/vertical-calendar";
 import "./ui/calendar.css";
 import { DateRange } from "react-day-picker";
 import { ScrollArea } from "./ui/scroll-area";
@@ -43,7 +44,7 @@ const SearchDialog = ({ isOpen, onClose, onSearch }: SearchDialogProps) => {
   const handleNext = () => {
     if (step === "location") setStep("dates");
     else if (step === "dates") {
-      if (dateMode === "dates" && !dates) return;
+      if (dateMode === "dates" && (!dates?.from || !dates?.to)) return;
       if (dateMode === "months" && !startDate) return;
       setStep("guests");
     } else if (step === "guests") {
@@ -62,7 +63,10 @@ const SearchDialog = ({ isOpen, onClose, onSearch }: SearchDialogProps) => {
   const renderStepIndicator = () => {
     const getDateDisplay = () => {
       if (dateMode === "months" && startDate) {
-        return `${format(startDate, "MMM d")} - ${format(addMonths(startDate, numberOfMonths), "MMM d")}`;
+        return `${format(startDate, "MMM d")} - ${format(
+          addMonths(startDate, numberOfMonths),
+          "MMM d",
+        )}`;
       }
       return dates
         ? `${format(dates.from!, "MMM d")} - ${format(dates.to!, "MMM d")}`
@@ -165,20 +169,46 @@ const SearchDialog = ({ isOpen, onClose, onSearch }: SearchDialogProps) => {
         </TabsList>
 
         <TabsContent value="dates" className="mt-0">
-          <div className="calendar-container">
-            <div className="calendar-days-header">
-              {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
-                <div key={day} className="day-label">
-                  {day}
-                </div>
-              ))}
+          <div className="relative">
+            <div className="sticky top-0 z-10 bg-white border-b">
+              <div className="grid grid-cols-7 py-2">
+                {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
+                  (day) => (
+                    <div
+                      key={day}
+                      className="text-sm font-medium text-muted-foreground text-center"
+                    >
+                      {day}
+                    </div>
+                  ),
+                )}
+              </div>
             </div>
-            <div className="calendar-scroll">
-              <Calendar
+            <div className="pt-4">
+              <VerticalCalendar
                 mode="range"
                 selected={dates}
-                onSelect={setDates}
-                numberOfMonths={12}
+                onSelect={(newDates) => {
+                  // If we already have a complete range and user clicks a new date
+                  if (dates?.from && dates?.to && newDates?.from) {
+                    // Reset dates state completely
+                    setDates(undefined);
+                    // Set the new start date in the next tick
+                    requestAnimationFrame(() => {
+                      setDates({ from: newDates.from, to: undefined });
+                    });
+                    return;
+                  }
+
+                  // Normal selection behavior
+                  setDates(newDates);
+                  // Move to next step if range is complete
+                  if (newDates?.from && newDates?.to) {
+                    setStep("guests");
+                  }
+                }}
+                numberOfMonths={13}
+                fromMonth={startOfToday()}
                 className="w-full"
                 disabled={(date) => isBefore(date, startOfToday())}
                 showOutsideDays={false}
@@ -341,7 +371,12 @@ const SearchDialog = ({ isOpen, onClose, onSearch }: SearchDialogProps) => {
           </Button>
           <Button
             onClick={handleNext}
-            disabled={!location}
+            disabled={
+              !location ||
+              (step === "dates" &&
+                dateMode === "dates" &&
+                (!dates?.from || !dates?.to))
+            }
             className="w-full sm:w-auto"
           >
             {step === "guests" ? "Search" : "Next"}
