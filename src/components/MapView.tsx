@@ -68,7 +68,10 @@ const MapView = ({
 
   // Placeholder for map container
   return (
-    <div className="w-full h-full relative bg-gray-100">
+    <div
+      className="w-full h-full relative bg-gray-100"
+      onClick={() => setSelectedProperty(null)}
+    >
       {/* Map placeholder */}
       <div className="w-full h-full bg-gray-200 relative">
         {/* Simulated map markers */}
@@ -83,7 +86,8 @@ const MapView = ({
                     left: `${(property.lng - center.lng) * 1000 + 50}%`,
                     top: `${(property.lat - center.lat) * 1000 + 50}%`,
                   }}
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent click from bubbling to map background
                     setSelectedProperty(property);
                     onMarkerClick(property);
                   }}
