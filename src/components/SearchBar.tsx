@@ -15,6 +15,7 @@ interface SearchBarProps {
   }) => void;
   className?: string;
   isMapSearchMode?: boolean;
+  variant?: "default" | "compact";
 }
 
 const SearchBar = ({
@@ -22,7 +23,7 @@ const SearchBar = ({
   className,
   isMapSearchMode = false,
   variant = "default",
-}: SearchBarProps & { variant?: "default" | "compact" }) => {
+}: SearchBarProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchParams] = useSearchParams();
 
@@ -55,10 +56,10 @@ const SearchBar = ({
           )}
           onClick={() => setIsDialogOpen(true)}
         >
-          <Search className="h-4 w-4" />
-          <div className="flex flex-col">
-            <div className="text-sm font-medium">{location}</div>
-            <div className="text-xs text-muted-foreground">
+          <Search className="h-4 w-4 flex-shrink-0" />
+          <div className="flex flex-col min-w-0">
+            <div className="text-sm font-medium truncate">{location}</div>
+            <div className="text-xs text-muted-foreground truncate">
               {getDateRangeDisplay()} · {getGuestsDisplay()}
             </div>
           </div>
@@ -83,20 +84,24 @@ const SearchBar = ({
         onClick={() => setIsDialogOpen(true)}
       >
         <div className="flex flex-1 items-center px-6 hover:bg-gray-50 rounded-l-full transition-colors">
-          <span className="text-sm font-medium">
+          <span className="text-sm font-medium truncate">
             {isMapSearchMode ? location : "Anywhere"}
           </span>
         </div>
         <div className="h-full w-[1px] bg-gray-200" />
         <div className="flex flex-1 items-center px-6 hover:bg-gray-50 transition-colors">
-          <span className="text-sm font-medium">{getDateRangeDisplay()}</span>
+          <span className="text-sm font-medium truncate">
+            {getDateRangeDisplay()}
+          </span>
         </div>
         <div className="h-full w-[1px] bg-gray-200" />
         <div className="flex items-center pl-6 pr-2 hover:bg-gray-50 rounded-r-full transition-colors">
-          <span className="text-sm text-gray-600">{getGuestsDisplay()}</span>
+          <span className="text-sm text-gray-600 truncate">
+            {getGuestsDisplay()}
+          </span>
           <Button
             size="icon"
-            className="ml-4 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 h-8 w-8"
+            className="ml-4 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 h-8 w-8 flex-shrink-0"
           >
             <Search className="h-4 w-4" />
           </Button>
@@ -111,19 +116,25 @@ const SearchBar = ({
         )}
         onClick={() => setIsDialogOpen(true)}
       >
-        <div className="flex items-center px-4 border-r h-full">
-          <span className="text-sm font-medium">
+        <div className="flex items-center px-4 border-r h-full min-w-0">
+          <span className="text-sm font-medium truncate">
             {isMapSearchMode ? location : "Anywhere"}
           </span>
         </div>
-        <div className="flex items-center justify-center px-4 border-r h-full">
-          <span className="text-sm font-medium">{getDateRangeDisplay()}</span>
+        <div className="flex items-center justify-center px-4 border-r h-full min-w-0">
+          <span className="text-sm font-medium truncate">
+            {getDateRangeDisplay()}
+          </span>
         </div>
         <div className="flex items-center justify-between px-4 h-full">
-          <span className="text-sm text-gray-600">{getGuestsDisplay()}</span>
+          <div className="min-w-0 flex-1 mr-2">
+            <span className="text-sm text-gray-600 truncate block">
+              {getGuestsDisplay()}
+            </span>
+          </div>
           <Button
             size="icon"
-            className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 h-8 w-8"
+            className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 h-8 w-8 flex-shrink-0"
           >
             <Search className="h-4 w-4" />
           </Button>

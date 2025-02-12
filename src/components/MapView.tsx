@@ -127,30 +127,36 @@ const MapView = ({
 
           map.addListener("dragend", () => {
             isDragging = false;
+            // Trigger bounds changed when drag ends
+            const bounds = map.getBounds();
+            if (bounds && onBoundsChanged) {
+              onBoundsChanged(bounds);
+            }
           });
 
           map.addListener("zoom_changed", () => {
             isZooming = true;
+            // Trigger bounds changed when zoom ends
             setTimeout(() => {
               isZooming = false;
-            }, 300);
-          });
-
-          map.addListener("bounds_changed", () => {
-            // Only trigger if the user is actively dragging or just changed zoom
-            if (!isDragging && !isZooming) return;
-
-            // Debounce the bounds changed event
-            clearTimeout(boundsChangeTimeout);
-            boundsChangeTimeout = setTimeout(() => {
               const bounds = map.getBounds();
               if (bounds && onBoundsChanged) {
                 onBoundsChanged(bounds);
               }
-            }, 500); // Wait for 500ms after the last bounds change
+            }, 300);
           });
-        } else {
-          // Update existing map's center and zoom
+
+          map.addListener("idle", () => {
+            // Update bounds when map becomes idle (after pan/zoom)
+            const bounds = map.getBounds();
+            if (bounds && onBoundsChanged) {
+              onBoundsChanged(bounds);
+            }
+          });
+        }
+
+        // Update existing map's center and zoom
+        if (mapInstanceRef.current) {
           mapInstanceRef.current.setCenter(center);
           mapInstanceRef.current.setZoom(zoom);
         }
@@ -182,6 +188,15 @@ const MapView = ({
 
           markersRef.current.push(marker);
         });
+
+        // Fit bounds to show all markers if there are properties
+        if (properties.length > 0 && mapInstanceRef.current) {
+          const bounds = new google.maps.LatLngBounds();
+          properties.forEach((property) => {
+            bounds.extend({ lat: property.lat, lng: property.lng });
+          });
+          mapInstanceRef.current.fitBounds(bounds);
+        }
       })
       .catch((error) => {
         console.error("Error loading Google Maps API:", error);
