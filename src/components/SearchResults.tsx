@@ -8,7 +8,7 @@ import { PropertyWithImages } from "@/lib/types";
 import { useSearchParams } from "react-router-dom";
 import PropertyGrid from "./PropertyGrid";
 import MapView from "./MapView";
-import Header from "./Header";
+import SearchBar from "./SearchBar";
 import MobileNav from "./MobileNav";
 import PropertyCard from "./PropertyCard";
 import { Button } from "./ui/button";
@@ -145,7 +145,39 @@ const SearchResults = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <Header isMapSearchMode={hasUserInteractedWithMap && isMapSearchMode} />
+      <div className="sticky top-0 z-50 w-full border-b bg-white">
+        <div className="container mx-auto h-20 flex items-center justify-between gap-4 px-6">
+          <div className="md:hidden flex-1">
+            <SearchBar
+              variant="compact"
+              onSearch={() => {}}
+              className="w-full"
+              isMapSearchMode={hasUserInteractedWithMap && isMapSearchMode}
+            />
+          </div>
+          <div className="hidden md:flex w-full items-center justify-between">
+            <div className="flex-none">
+              <h1 className="text-2xl font-bold text-primary">RentalSpace</h1>
+            </div>
+            <div className="flex-none w-[480px]">
+              <SearchBar
+                onSearch={() => {}}
+                className="w-full"
+                isMapSearchMode={hasUserInteractedWithMap && isMapSearchMode}
+              />
+            </div>
+            <div className="flex items-center gap-4">
+              <Button variant="ghost">Become a host</Button>
+              <div className="flex items-center gap-2">
+                <Button variant="ghost" onClick={() => {}}>
+                  Login
+                </Button>
+                <Button onClick={() => {}}>Sign up</Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <MobileNav />
 
       {/* Mobile view */}
@@ -156,7 +188,7 @@ const SearchResults = () => {
             onFavoriteToggle={handleFavoriteToggle}
           />
         ) : (
-          <div className="h-[calc(100vh-180px)]">
+          <div className="h-[calc(100dvh-144px)]">
             <MapView
               properties={properties}
               center={mapCenter}
@@ -177,18 +209,6 @@ const SearchResults = () => {
                 {displayedProperties.length} properties found
                 {isMapSearchMode && " in this area"}
               </p>
-              {isMapSearchMode && (
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setIsMapSearchMode(false);
-                    setHasUserInteractedWithMap(false);
-                    setVisibleProperties([]);
-                  }}
-                >
-                  Clear map search
-                </Button>
-              )}
             </div>
             <div className="grid grid-cols-2 gap-6">
               {displayedProperties.map((property) => (

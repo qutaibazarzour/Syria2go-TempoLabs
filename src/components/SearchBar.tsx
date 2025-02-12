@@ -21,7 +21,8 @@ const SearchBar = ({
   onSearch = () => {},
   className,
   isMapSearchMode = false,
-}: SearchBarProps) => {
+  variant = "default",
+}: SearchBarProps & { variant?: "default" | "compact" }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchParams] = useSearchParams();
 
@@ -40,9 +41,36 @@ const SearchBar = ({
   };
 
   const getGuestsDisplay = () => {
-    if (!guests) return window.innerWidth < 768 ? "Guests" : "Add guests";
+    if (!guests) return window.innerWidth >= 768 ? "Add guests" : "Guests";
     return `${guests} guest${Number(guests) > 1 ? "s" : ""}`;
   };
+
+  if (variant === "compact") {
+    return (
+      <>
+        <div
+          className={cn(
+            "flex items-center gap-2 rounded-full border shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer bg-white px-4 py-3.5",
+            className,
+          )}
+          onClick={() => setIsDialogOpen(true)}
+        >
+          <Search className="h-4 w-4" />
+          <div className="flex flex-col">
+            <div className="text-sm font-medium">{location}</div>
+            <div className="text-xs text-muted-foreground">
+              {getDateRangeDisplay()} · {getGuestsDisplay()}
+            </div>
+          </div>
+        </div>
+        <SearchDialog
+          isOpen={isDialogOpen}
+          onClose={() => setIsDialogOpen(false)}
+          onSearch={onSearch}
+        />
+      </>
+    );
+  }
 
   return (
     <>
@@ -55,7 +83,9 @@ const SearchBar = ({
         onClick={() => setIsDialogOpen(true)}
       >
         <div className="flex flex-1 items-center px-6 hover:bg-gray-50 rounded-l-full transition-colors">
-          <span className="text-sm font-medium">{location}</span>
+          <span className="text-sm font-medium">
+            {isMapSearchMode ? location : "Anywhere"}
+          </span>
         </div>
         <div className="h-full w-[1px] bg-gray-200" />
         <div className="flex flex-1 items-center px-6 hover:bg-gray-50 transition-colors">
@@ -76,19 +106,27 @@ const SearchBar = ({
       {/* Mobile Search Bar */}
       <div
         className={cn(
-          "md:hidden flex flex-col w-full rounded-full border shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer bg-white",
+          "md:hidden grid grid-cols-[1fr,1fr,0.8fr] items-center rounded-full border shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer bg-white h-14",
           className,
         )}
         onClick={() => setIsDialogOpen(true)}
       >
-        <div className="flex items-center p-3 gap-3">
-          <Search className="h-4 w-4 text-primary" />
-          <div className="flex flex-col">
-            <span className="text-sm font-medium">{location}</span>
-            <span className="text-xs text-muted-foreground">
-              {getDateRangeDisplay()} · {getGuestsDisplay()}
-            </span>
-          </div>
+        <div className="flex items-center px-4 border-r h-full">
+          <span className="text-sm font-medium">
+            {isMapSearchMode ? location : "Anywhere"}
+          </span>
+        </div>
+        <div className="flex items-center justify-center px-4 border-r h-full">
+          <span className="text-sm font-medium">{getDateRangeDisplay()}</span>
+        </div>
+        <div className="flex items-center justify-between px-4 h-full">
+          <span className="text-sm text-gray-600">{getGuestsDisplay()}</span>
+          <Button
+            size="icon"
+            className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 h-8 w-8"
+          >
+            <Search className="h-4 w-4" />
+          </Button>
         </div>
       </div>
 
