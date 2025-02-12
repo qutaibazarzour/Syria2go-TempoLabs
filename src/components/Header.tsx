@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
 import { Menu } from "lucide-react";
 import SearchBar from "./SearchBar";
@@ -44,7 +45,12 @@ const Header = ({
       <div className="container mx-auto h-20 flex items-center justify-between gap-4 px-6">
         {/* Logo - Hidden on mobile */}
         <div className="flex-none hidden md:block">
-          <h1 className="text-2xl font-bold text-primary">RentalSpace</h1>
+          <Link
+            to="/"
+            className="text-2xl font-bold text-primary hover:opacity-80 transition-opacity"
+          >
+            SyriaGo
+          </Link>
         </div>
 
         {/* Search Bar */}

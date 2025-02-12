@@ -10,22 +10,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./ui/tooltip";
-
-interface Property {
-  id: string;
-  lat: number;
-  lng: number;
-  price: number;
-  title: string;
-  location: string;
-  images: string[];
-  rating: number;
-  reviews: number;
-}
+import { PropertyWithImages } from "@/lib/types";
 
 interface MapViewProps {
-  properties?: Property[];
-  onMarkerClick?: (property: Property) => void;
+  properties?: PropertyWithImages[];
+  onMarkerClick?: (property: PropertyWithImages) => void;
   center?: { lat: number; lng: number };
   zoom?: number;
   onBoundsChanged?: (bounds: google.maps.LatLngBounds) => void;
@@ -46,42 +35,14 @@ const loader = new Loader({
 });
 
 const MapView = ({
-  properties = [
-    {
-      id: "1",
-      lat: 40.014984,
-      lng: -105.270546,
-      price: 250,
-      title: "Mountain View Cabin",
-      location: "Boulder, Colorado",
-      images: [
-        "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&auto=format&fit=crop&q=60",
-      ],
-      rating: 4.8,
-      reviews: 124,
-    },
-    {
-      id: "2",
-      lat: 40.024984,
-      lng: -105.280546,
-      price: 175,
-      title: "Downtown Loft",
-      location: "Boulder, Colorado",
-      images: [
-        "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=60",
-      ],
-      rating: 4.5,
-      reviews: 89,
-    },
-  ],
+  properties = [],
   onMarkerClick = () => {},
-  center = { lat: 40.014984, lng: -105.270546 },
+  center = { lat: 33.5138, lng: 36.2765 }, // Damascus
   zoom = 13,
   onBoundsChanged = () => {},
 }: MapViewProps) => {
-  const [selectedProperty, setSelectedProperty] = useState<Property | null>(
-    null,
-  );
+  const [selectedProperty, setSelectedProperty] =
+    useState<PropertyWithImages | null>(null);
 
   const mapRef = useRef(null);
   const markersRef = useRef([]);
@@ -171,7 +132,7 @@ const MapView = ({
             position: { lat: property.lat, lng: property.lng },
             map: mapInstanceRef.current,
             label: {
-              text: `${property.price}`,
+              text: `$${property.price}`,
               className: "marker-label",
               color: "#000000",
               fontFamily: "system-ui",
@@ -184,18 +145,26 @@ const MapView = ({
             e.stop(); // Prevent the click from bubbling to the map
             setSelectedProperty(property);
             onMarkerClick(property);
+
+            // Pan to the marker's position without changing zoom
+            if (mapInstanceRef.current) {
+              mapInstanceRef.current.panTo({
+                lat: property.lat,
+                lng: property.lng,
+              });
+            }
           });
 
           markersRef.current.push(marker);
         });
 
-        // Fit bounds to show all markers if there are properties
-        if (properties.length > 0 && mapInstanceRef.current) {
+        // Only fit bounds on initial load when map instance is first created
+        if (!mapInstanceRef.current && properties.length > 0) {
           const bounds = new google.maps.LatLngBounds();
           properties.forEach((property) => {
             bounds.extend({ lat: property.lat, lng: property.lng });
           });
-          mapInstanceRef.current.fitBounds(bounds);
+          map.fitBounds(bounds);
         }
       })
       .catch((error) => {
@@ -217,12 +186,15 @@ const MapView = ({
       {selectedProperty && (
         <Card className="absolute bottom-4 left-4 w-[320px] z-10">
           <PropertyCard
+            images={
+              selectedProperty.property_images?.map((img) => img.url) || []
+            }
             title={selectedProperty.title}
             location={selectedProperty.location}
             price={selectedProperty.price}
-            images={selectedProperty.images}
             rating={selectedProperty.rating}
             reviews={selectedProperty.reviews}
+            isFavorite={selectedProperty.isFavorite}
           />
         </Card>
       )}

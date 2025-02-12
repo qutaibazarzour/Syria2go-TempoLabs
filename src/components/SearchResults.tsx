@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import {
   fetchProperties,
   toggleFavorite,
@@ -157,7 +158,12 @@ const SearchResults = () => {
           </div>
           <div className="hidden md:flex w-full items-center justify-between">
             <div className="flex-none">
-              <h1 className="text-2xl font-bold text-primary">RentalSpace</h1>
+              <Link
+                to="/"
+                className="text-2xl font-bold text-primary hover:opacity-80 transition-opacity"
+              >
+                SyriaGo
+              </Link>
             </div>
             <div className="flex-none w-[480px]">
               <SearchBar

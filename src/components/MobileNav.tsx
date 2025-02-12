@@ -5,6 +5,7 @@ import { Button } from "./ui/button";
 import { ScrollArea } from "./ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 interface MobileNavProps {
   isLoggedIn?: boolean;
@@ -24,13 +25,18 @@ const MobileNav = ({
   onLogout = () => {},
 }: MobileNavProps) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isHome = location.pathname === "/";
+
   return (
     <div className="fixed bottom-0 left-0 right-0 border-t bg-white md:hidden z-50">
       <div className="flex items-center justify-around h-16 px-4">
         <Button
           variant="ghost"
           size="icon"
-          className="flex flex-col items-center gap-1"
+          className={`flex flex-col items-center gap-1 ${isHome ? "text-primary" : ""}`}
+          onClick={() => navigate("/")}
         >
           <Home className="h-5 w-5" />
           <span className="text-xs">Explore</span>

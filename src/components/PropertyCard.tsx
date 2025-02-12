@@ -23,39 +23,45 @@ interface PropertyCardProps {
 }
 
 const PropertyCard = ({
-  images = [
-    "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&auto=format&fit=crop&q=60",
-    "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=60",
-    "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&auto=format&fit=crop&q=60",
-  ],
-  title = "Cozy Mountain Retreat",
-  location = "Boulder, Colorado",
-  price = 250,
-  rating = 4.8,
-  reviews = 124,
+  images = [],
+  title = "",
+  location = "",
+  price = 0,
+  rating = 0,
+  reviews = 0,
   isFavorite = false,
   onFavoriteClick = () => {},
 }: PropertyCardProps) => {
   return (
     <Card className="w-full overflow-hidden bg-white hover:shadow-lg transition-shadow duration-300">
       <CardContent className="p-0 relative">
-        <Carousel className="w-full">
-          <CarouselContent>
-            {images.map((image, index) => (
-              <CarouselItem key={index}>
-                <div className="aspect-[4/3] relative">
-                  <img
-                    src={image}
-                    alt={`Property view ${index + 1}`}
-                    className="object-cover w-full h-full rounded-t-lg"
-                  />
-                </div>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          <CarouselPrevious className="left-2" />
-          <CarouselNext className="right-2" />
-        </Carousel>
+        {images.length > 0 ? (
+          <Carousel className="w-full">
+            <CarouselContent>
+              {images.map((image, index) => (
+                <CarouselItem key={index}>
+                  <div className="aspect-[4/3] relative">
+                    <img
+                      src={image}
+                      alt={`Property view ${index + 1}`}
+                      className="object-cover w-full h-full rounded-t-lg"
+                    />
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            {images.length > 1 && (
+              <>
+                <CarouselPrevious className="left-2" />
+                <CarouselNext className="right-2" />
+              </>
+            )}
+          </Carousel>
+        ) : (
+          <div className="aspect-[4/3] relative bg-gray-100 rounded-t-lg flex items-center justify-center">
+            <span className="text-gray-400">No image available</span>
+          </div>
+        )}
 
         <Button
           variant="ghost"
