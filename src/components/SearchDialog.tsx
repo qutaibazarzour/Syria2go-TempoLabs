@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { addMonths, format, isBefore, startOfToday } from "date-fns";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { cn } from "@/lib/utils";
+import { useSearchParams, useNavigate } from "react-router-dom";
 
 type SearchStep = "location" | "dates" | "guests";
 
@@ -27,6 +28,7 @@ interface SearchDialogProps {
 }
 
 const SearchDialog = ({ isOpen, onClose, onSearch }: SearchDialogProps) => {
+  const navigate = useNavigate();
   const [step, setStep] = useState<SearchStep>("location");
   const [location, setLocation] = useState("");
   const [dates, setDates] = useState<DateRange>();
@@ -83,7 +85,7 @@ const SearchDialog = ({ isOpen, onClose, onSearch }: SearchDialogProps) => {
       if (guests.adults + guests.children > 0)
         searchParams.set("guests", String(guests.adults + guests.children));
 
-      window.location.href = `/search?${searchParams.toString()}`;
+      navigate(`/search?${searchParams.toString()}`);
       onClose();
     }
   };

@@ -62,7 +62,7 @@ const PropertyGrid = ({
   onFavoriteToggle = () => {},
 }: PropertyGridProps) => {
   return (
-    <div className="w-full min-h-screen bg-gray-50 p-6">
+    <div className="w-full min-h-screen bg-gray-50 p-6 pb-24 md:pb-6">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {properties.map((property) => (
