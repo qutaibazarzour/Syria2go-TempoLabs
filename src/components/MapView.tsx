@@ -117,7 +117,29 @@ const MapView = ({
 
           // Add bounds changed listener
           let boundsChangeTimeout: NodeJS.Timeout;
+          let isDragging = false;
+          let isZooming = false;
+
+          // Track user interactions
+          map.addListener("dragstart", () => {
+            isDragging = true;
+          });
+
+          map.addListener("dragend", () => {
+            isDragging = false;
+          });
+
+          map.addListener("zoom_changed", () => {
+            isZooming = true;
+            setTimeout(() => {
+              isZooming = false;
+            }, 300);
+          });
+
           map.addListener("bounds_changed", () => {
+            // Only trigger if the user is actively dragging or just changed zoom
+            if (!isDragging && !isZooming) return;
+
             // Debounce the bounds changed event
             clearTimeout(boundsChangeTimeout);
             boundsChangeTimeout = setTimeout(() => {

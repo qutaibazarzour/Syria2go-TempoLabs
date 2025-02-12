@@ -46,9 +46,10 @@ const SearchBar = ({
 
   return (
     <>
+      {/* Desktop Search Bar */}
       <div
         className={cn(
-          "flex h-12 items-stretch rounded-full border shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer bg-white",
+          "hidden md:flex h-12 items-stretch rounded-full border shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer bg-white",
           className,
         )}
         onClick={() => setIsDialogOpen(true)}
@@ -69,6 +70,25 @@ const SearchBar = ({
           >
             <Search className="h-4 w-4" />
           </Button>
+        </div>
+      </div>
+
+      {/* Mobile Search Bar */}
+      <div
+        className={cn(
+          "md:hidden flex flex-col w-full rounded-full border shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer bg-white",
+          className,
+        )}
+        onClick={() => setIsDialogOpen(true)}
+      >
+        <div className="flex items-center p-3 gap-3">
+          <Search className="h-4 w-4 text-primary" />
+          <div className="flex flex-col">
+            <span className="text-sm font-medium">{location}</span>
+            <span className="text-xs text-muted-foreground">
+              {getDateRangeDisplay()} · {getGuestsDisplay()}
+            </span>
+          </div>
         </div>
       </div>
 

@@ -19,36 +19,14 @@ const SearchResults = () => {
   const [view, setView] = useState<"list" | "map">("list");
   const [mapCenter, setMapCenter] = useState({ lat: 33.5138, lng: 36.2765 }); // Damascus
   const [mapZoom, setMapZoom] = useState(12);
+  const [hasUserInteractedWithMap, setHasUserInteractedWithMap] =
+    useState(false);
   const [isMapSearchMode, setIsMapSearchMode] = useState(false);
   const [visibleProperties, setVisibleProperties] = useState<
     PropertyWithImages[]
   >([]);
 
-  const defaultProperties: PropertyWithImages[] = [
-    {
-      id: "1",
-      images: [
-        "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&auto=format&fit=crop&q=60",
-        "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=60",
-      ],
-      title: "Historic Damascus Villa",
-      location: "Damascus, Syria",
-      price: 150,
-      rating: 4.9,
-      reviews: 156,
-      isFavorite: false,
-      lat: 33.5138,
-      lng: 36.2765,
-      created_at: null,
-      description: null,
-      user_id: null,
-      property_images: [],
-    },
-    // ... other default properties
-  ];
-
-  const [properties, setProperties] =
-    useState<PropertyWithImages[]>(defaultProperties);
+  const [properties, setProperties] = useState<PropertyWithImages[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -116,6 +94,9 @@ const SearchResults = () => {
   };
 
   const handleBoundsChanged = (bounds: google.maps.LatLngBounds) => {
+    if (!hasUserInteractedWithMap) {
+      setHasUserInteractedWithMap(true);
+    }
     setIsMapSearchMode(true);
     const visible = properties.filter((property) => {
       return bounds.contains({
@@ -164,7 +145,7 @@ const SearchResults = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <Header isMapSearchMode={isMapSearchMode} />
+      <Header isMapSearchMode={hasUserInteractedWithMap && isMapSearchMode} />
       <MobileNav />
 
       {/* Mobile view */}
@@ -201,6 +182,7 @@ const SearchResults = () => {
                   variant="outline"
                   onClick={() => {
                     setIsMapSearchMode(false);
+                    setHasUserInteractedWithMap(false);
                     setVisibleProperties([]);
                   }}
                 >
