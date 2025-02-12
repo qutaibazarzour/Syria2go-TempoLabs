@@ -14,13 +14,20 @@ interface SearchBarProps {
     guests: number;
   }) => void;
   className?: string;
+  isMapSearchMode?: boolean;
 }
 
-const SearchBar = ({ onSearch = () => {}, className }: SearchBarProps) => {
+const SearchBar = ({
+  onSearch = () => {},
+  className,
+  isMapSearchMode = false,
+}: SearchBarProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchParams] = useSearchParams();
 
-  const location = searchParams.get("location") || "Anywhere";
+  const location = isMapSearchMode
+    ? "Map area"
+    : searchParams.get("location") || "Anywhere";
   const checkIn = searchParams.get("checkIn");
   const checkOut = searchParams.get("checkOut");
   const guests = searchParams.get("guests");
@@ -33,7 +40,7 @@ const SearchBar = ({ onSearch = () => {}, className }: SearchBarProps) => {
   };
 
   const getGuestsDisplay = () => {
-    if (!guests) return "Add guests";
+    if (!guests) return window.innerWidth < 768 ? "Guests" : "Add guests";
     return `${guests} guest${Number(guests) > 1 ? "s" : ""}`;
   };
 

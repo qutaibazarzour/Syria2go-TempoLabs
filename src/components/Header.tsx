@@ -6,7 +6,6 @@ import {
   NavigationMenu,
   NavigationMenuContent,
   NavigationMenuItem,
-  NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "./ui/navigation-menu";
@@ -27,6 +26,7 @@ interface HeaderProps {
   onLogin?: () => void;
   onSignup?: () => void;
   onLogout?: () => void;
+  isMapSearchMode?: boolean;
 }
 
 const Header = ({
@@ -37,6 +37,7 @@ const Header = ({
   onLogin = () => {},
   onSignup = () => {},
   onLogout = () => {},
+  isMapSearchMode = false,
 }: HeaderProps) => {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white">
@@ -48,7 +49,11 @@ const Header = ({
 
         {/* Search Bar */}
         <div className="flex-1 md:flex-none md:w-[480px]">
-          <SearchBar onSearch={() => onSearch("")} className="w-full" />
+          <SearchBar
+            onSearch={() => onSearch("")}
+            className="w-full"
+            isMapSearchMode={isMapSearchMode}
+          />
         </div>
 
         {/* Navigation - Hidden on mobile */}

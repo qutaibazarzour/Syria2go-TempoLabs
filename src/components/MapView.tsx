@@ -28,6 +28,7 @@ interface MapViewProps {
   onMarkerClick?: (property: Property) => void;
   center?: { lat: number; lng: number };
   zoom?: number;
+  onBoundsChanged?: (bounds: google.maps.LatLngBounds) => void;
 }
 
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "";
@@ -35,6 +36,7 @@ const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "";
 const loader = new Loader({
   apiKey: GOOGLE_MAPS_API_KEY,
   version: "weekly",
+  libraries: ["places"],
 });
 
 const MapView = ({
@@ -69,6 +71,7 @@ const MapView = ({
   onMarkerClick = () => {},
   center = { lat: 40.014984, lng: -105.270546 },
   zoom = 13,
+  onBoundsChanged = () => {},
 }: MapViewProps) => {
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(
     null,
@@ -79,40 +82,82 @@ const MapView = ({
   const mapInstanceRef = useRef(null);
 
   useEffect(() => {
-    loader.load().then(() => {
-      const map = new google.maps.Map(mapRef.current, {
-        center,
-        zoom,
-        disableDefaultUI: true,
-        styles: [
-          {
-            featureType: "poi",
-            elementType: "labels",
-            stylers: [{ visibility: "off" }],
-          },
-        ],
-      });
-      mapInstanceRef.current = map;
+    if (!mapRef.current) return;
 
-      // Create markers for each property
-      properties.forEach((property) => {
-        const marker = new google.maps.Marker({
-          position: { lat: property.lat, lng: property.lng },
-          map,
-          label: {
-            text: `${property.price}`,
-            className: "marker-label",
-          },
+    // Load Google Maps API and initialize map
+    loader
+      .load()
+      .then(() => {
+        // Initialize map if it doesn't exist yet
+        if (!mapInstanceRef.current) {
+          const map = new google.maps.Map(mapRef.current, {
+            center,
+            zoom,
+            disableDefaultUI: true,
+            styles: [
+              {
+                featureType: "poi",
+                elementType: "labels",
+                stylers: [{ visibility: "off" }],
+              },
+            ],
+          });
+          mapInstanceRef.current = map;
+
+          // Add click listener to map to close the card
+          map.addListener("click", () => {
+            setSelectedProperty(null);
+          });
+
+          // Add bounds changed listener
+          let boundsChangeTimeout: NodeJS.Timeout;
+          map.addListener("bounds_changed", () => {
+            // Debounce the bounds changed event
+            clearTimeout(boundsChangeTimeout);
+            boundsChangeTimeout = setTimeout(() => {
+              const bounds = map.getBounds();
+              if (bounds && onBoundsChanged) {
+                onBoundsChanged(bounds);
+              }
+            }, 500); // Wait for 500ms after the last bounds change
+          });
+        } else {
+          // Update existing map's center and zoom
+          mapInstanceRef.current.setCenter(center);
+          mapInstanceRef.current.setZoom(zoom);
+        }
+
+        // Clear existing markers
+        markersRef.current.forEach((marker) => marker.setMap(null));
+        markersRef.current = [];
+
+        // Create markers for each property
+        properties.forEach((property) => {
+          const marker = new google.maps.Marker({
+            position: { lat: property.lat, lng: property.lng },
+            map: mapInstanceRef.current,
+            label: {
+              text: `${property.price}`,
+              className: "marker-label",
+              color: "#000000",
+              fontFamily: "system-ui",
+              fontSize: "14px",
+              fontWeight: "500",
+            },
+          });
+
+          marker.addListener("click", (e: google.maps.MapMouseEvent) => {
+            e.stop(); // Prevent the click from bubbling to the map
+            setSelectedProperty(property);
+            onMarkerClick(property);
+          });
+
+          markersRef.current.push(marker);
         });
-
-        marker.addListener("click", () => {
-          setSelectedProperty(property);
-          onMarkerClick(property);
-        });
-
-        markersRef.current.push(marker);
+      })
+      .catch((error) => {
+        console.error("Error loading Google Maps API:", error);
       });
-    });
 
     return () => {
       // Cleanup markers
@@ -121,94 +166,50 @@ const MapView = ({
     };
   }, [properties, center, zoom]);
 
-  // Update markers when properties change
-  useEffect(() => {
-    if (!mapInstanceRef.current) return;
-
-    // Clear existing markers
-    markersRef.current.forEach((marker) => marker.setMap(null));
-    markersRef.current = [];
-
-    // Create new markers
-    properties.forEach((property) => {
-      const marker = new google.maps.Marker({
-        position: { lat: property.lat, lng: property.lng },
-        map: mapInstanceRef.current,
-        label: {
-          text: `${property.price}`,
-          className: "marker-label",
-        },
-      });
-
-      marker.addListener("click", () => {
-        setSelectedProperty(property);
-        onMarkerClick(property);
-      });
-
-      markersRef.current.push(marker);
-    });
-  }, [properties]);
-
   return (
-    <div
-      className="w-full h-full relative bg-white"
-      onClick={() => setSelectedProperty(null)}
-    >
-      <div ref={mapRef} className="w-full h-full relative">
-        {/* Simulated map markers */}
-        {properties.map((property) => (
-          <TooltipProvider key={property.id}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="absolute transform -translate-x-1/2 -translate-y-1/2 bg-white hover:bg-primary hover:text-white"
-                  style={{
-                    left: `${(property.lng - center.lng) * 1000 + 50}%`,
-                    top: `${(property.lat - center.lat) * 1000 + 50}%`,
-                  }}
-                  onClick={(e) => {
-                    e.stopPropagation(); // Prevent click from bubbling to map background
-                    setSelectedProperty(property);
-                    onMarkerClick(property);
-                  }}
-                >
-                  ${property.price}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <div className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4" />
-                  <span>{property.location}</span>
-                </div>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        ))}
+    <div className="w-full h-full relative bg-white">
+      <div ref={mapRef} className="w-full h-full relative" />
 
-        {/* Property preview card */}
-        {selectedProperty && (
-          <Card className="absolute bottom-4 left-4 w-[320px] z-10">
-            <PropertyCard
-              title={selectedProperty.title}
-              location={selectedProperty.location}
-              price={selectedProperty.price}
-              images={selectedProperty.images}
-              rating={selectedProperty.rating}
-              reviews={selectedProperty.reviews}
-            />
-          </Card>
-        )}
+      {/* Property preview card */}
+      {selectedProperty && (
+        <Card className="absolute bottom-4 left-4 w-[320px] z-10">
+          <PropertyCard
+            title={selectedProperty.title}
+            location={selectedProperty.location}
+            price={selectedProperty.price}
+            images={selectedProperty.images}
+            rating={selectedProperty.rating}
+            reviews={selectedProperty.reviews}
+          />
+        </Card>
+      )}
 
-        {/* Map controls placeholder */}
-        <div className="absolute right-4 bottom-4 flex flex-col gap-2">
-          <Button variant="outline" className="bg-white">
-            +
-          </Button>
-          <Button variant="outline" className="bg-white">
-            -
-          </Button>
-        </div>
+      {/* Map controls */}
+      <div className="absolute right-4 bottom-4 flex flex-col gap-2">
+        <Button
+          variant="outline"
+          className="bg-white"
+          onClick={() => {
+            if (mapInstanceRef.current) {
+              const zoom = mapInstanceRef.current.getZoom();
+              mapInstanceRef.current.setZoom(zoom + 1);
+            }
+          }}
+        >
+          +
+        </Button>
+        <Button
+          variant="outline"
+          className="bg-white"
+          onClick={() => {
+            if (mapInstanceRef.current) {
+              const zoom = mapInstanceRef.current.getZoom();
+              mapInstanceRef.current.setZoom(zoom - 1);
+            }
+          }}
+        >
+          -
+        </Button>
       </div>
     </div>
   );
