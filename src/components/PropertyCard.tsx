@@ -37,7 +37,7 @@ const PropertyCard = ({
   onFavoriteClick = () => {},
 }: PropertyCardProps) => {
   return (
-    <Card className="w-80 overflow-hidden bg-white hover:shadow-lg transition-shadow duration-300">
+    <Card className="w-full overflow-hidden bg-white hover:shadow-lg transition-shadow duration-300">
       <CardContent className="p-0 relative">
         <Carousel className="w-full">
           <CarouselContent>

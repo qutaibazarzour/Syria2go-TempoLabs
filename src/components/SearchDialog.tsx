@@ -74,11 +74,16 @@ const SearchDialog = ({ isOpen, onClose, onSearch }: SearchDialogProps) => {
                 to: addMonths(startDate, 12),
               }
             : dates;
-      onSearch({
-        location,
-        dates: finalDates,
-        guests: guests.adults + guests.children,
-      });
+      const searchParams = new URLSearchParams();
+      if (location) searchParams.set("location", location);
+      if (finalDates?.from)
+        searchParams.set("checkIn", finalDates.from.toISOString());
+      if (finalDates?.to)
+        searchParams.set("checkOut", finalDates.to.toISOString());
+      if (guests.adults + guests.children > 0)
+        searchParams.set("guests", String(guests.adults + guests.children));
+
+      window.location.href = `/search?${searchParams.toString()}`;
       onClose();
     }
   };

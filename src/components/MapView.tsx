@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { Loader } from "@googlemaps/js-api-loader";
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
 import { MapPin } from "lucide-react";
@@ -28,6 +29,13 @@ interface MapViewProps {
   center?: { lat: number; lng: number };
   zoom?: number;
 }
+
+const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "";
+
+const loader = new Loader({
+  apiKey: GOOGLE_MAPS_API_KEY,
+  version: "weekly",
+});
 
 const MapView = ({
   properties = [
@@ -66,14 +74,87 @@ const MapView = ({
     null,
   );
 
-  // Placeholder for map container
+  const mapRef = useRef(null);
+  const markersRef = useRef([]);
+  const mapInstanceRef = useRef(null);
+
+  useEffect(() => {
+    loader.load().then(() => {
+      const map = new google.maps.Map(mapRef.current, {
+        center,
+        zoom,
+        disableDefaultUI: true,
+        styles: [
+          {
+            featureType: "poi",
+            elementType: "labels",
+            stylers: [{ visibility: "off" }],
+          },
+        ],
+      });
+      mapInstanceRef.current = map;
+
+      // Create markers for each property
+      properties.forEach((property) => {
+        const marker = new google.maps.Marker({
+          position: { lat: property.lat, lng: property.lng },
+          map,
+          label: {
+            text: `${property.price}`,
+            className: "marker-label",
+          },
+        });
+
+        marker.addListener("click", () => {
+          setSelectedProperty(property);
+          onMarkerClick(property);
+        });
+
+        markersRef.current.push(marker);
+      });
+    });
+
+    return () => {
+      // Cleanup markers
+      markersRef.current.forEach((marker) => marker.setMap(null));
+      markersRef.current = [];
+    };
+  }, [properties, center, zoom]);
+
+  // Update markers when properties change
+  useEffect(() => {
+    if (!mapInstanceRef.current) return;
+
+    // Clear existing markers
+    markersRef.current.forEach((marker) => marker.setMap(null));
+    markersRef.current = [];
+
+    // Create new markers
+    properties.forEach((property) => {
+      const marker = new google.maps.Marker({
+        position: { lat: property.lat, lng: property.lng },
+        map: mapInstanceRef.current,
+        label: {
+          text: `${property.price}`,
+          className: "marker-label",
+        },
+      });
+
+      marker.addListener("click", () => {
+        setSelectedProperty(property);
+        onMarkerClick(property);
+      });
+
+      markersRef.current.push(marker);
+    });
+  }, [properties]);
+
   return (
     <div
-      className="w-full h-full relative bg-gray-100"
+      className="w-full h-full relative bg-white"
       onClick={() => setSelectedProperty(null)}
     >
-      {/* Map placeholder */}
-      <div className="w-full h-full bg-gray-200 relative">
+      <div ref={mapRef} className="w-full h-full relative">
         {/* Simulated map markers */}
         {properties.map((property) => (
           <TooltipProvider key={property.id}>
