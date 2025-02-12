@@ -145,26 +145,18 @@ const MapView = ({
             e.stop(); // Prevent the click from bubbling to the map
             setSelectedProperty(property);
             onMarkerClick(property);
-
-            // Pan to the marker's position without changing zoom
-            if (mapInstanceRef.current) {
-              mapInstanceRef.current.panTo({
-                lat: property.lat,
-                lng: property.lng,
-              });
-            }
           });
 
           markersRef.current.push(marker);
         });
 
-        // Only fit bounds on initial load when map instance is first created
-        if (!mapInstanceRef.current && properties.length > 0) {
+        // Fit bounds to show all markers if there are properties
+        if (properties.length > 0 && mapInstanceRef.current) {
           const bounds = new google.maps.LatLngBounds();
           properties.forEach((property) => {
             bounds.extend({ lat: property.lat, lng: property.lng });
           });
-          map.fitBounds(bounds);
+          mapInstanceRef.current.fitBounds(bounds);
         }
       })
       .catch((error) => {
