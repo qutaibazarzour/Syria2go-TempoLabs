@@ -1,5 +1,5 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import { Menu } from "lucide-react";
 import SearchBar from "./SearchBar";
@@ -18,28 +18,39 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { useAuth } from "@/lib/auth";
+import AuthModal from "./auth/AuthModal";
 
 interface HeaderProps {
-  isLoggedIn?: boolean;
-  userName?: string;
-  userAvatar?: string;
   onSearch?: (query: string) => void;
-  onLogin?: () => void;
-  onSignup?: () => void;
-  onLogout?: () => void;
   isMapSearchMode?: boolean;
 }
 
 const Header = ({
-  isLoggedIn = false,
-  userName = "John Doe",
-  userAvatar = "https://api.dicebear.com/7.x/avataaars/svg?seed=John",
   onSearch = () => {},
-  onLogin = () => {},
-  onSignup = () => {},
-  onLogout = () => {},
   isMapSearchMode = false,
 }: HeaderProps) => {
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
+  const [showAuth, setShowAuth] = useState(false);
+  const [authDefaultTab, setAuthDefaultTab] = useState<"login" | "signup">(
+    "login",
+  );
+
+  const handleLogin = () => {
+    setAuthDefaultTab("login");
+    setShowAuth(true);
+  };
+
+  const handleSignup = () => {
+    setAuthDefaultTab("signup");
+    setShowAuth(true);
+  };
+
+  const handleLogout = async () => {
+    await signOut();
+  };
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white">
       <div className="container mx-auto h-20 flex items-center justify-between gap-4 px-6">
@@ -56,7 +67,7 @@ const Header = ({
         {/* Search Bar */}
         <div className="flex-1 md:flex-none md:w-[480px]">
           <SearchBar
-            onSearch={() => onSearch("")}
+            onSearch={onSearch}
             className="w-full"
             isMapSearchMode={isMapSearchMode}
           />
@@ -66,7 +77,7 @@ const Header = ({
         <div className="hidden md:flex items-center gap-4">
           <Button variant="ghost">Become a host</Button>
 
-          {isLoggedIn ? (
+          {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -74,8 +85,13 @@ const Header = ({
                   className="relative h-10 w-10 rounded-full"
                 >
                   <Avatar>
-                    <AvatarImage src={userAvatar} alt={userName} />
-                    <AvatarFallback>{userName.charAt(0)}</AvatarFallback>
+                    <AvatarImage
+                      src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`}
+                      alt={user.email || "User"}
+                    />
+                    <AvatarFallback>
+                      {user.email?.[0].toUpperCase()}
+                    </AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
@@ -83,28 +99,40 @@ const Header = ({
                 <DropdownMenuItem className="cursor-pointer">
                   Profile
                 </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer">
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={() => navigate("/settings")}
+                >
                   Settings
                 </DropdownMenuItem>
                 <DropdownMenuItem className="cursor-pointer">
                   My Properties
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="cursor-pointer" onClick={onLogout}>
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={handleLogout}
+                >
                   Logout
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
             <div className="flex items-center gap-2">
-              <Button variant="ghost" onClick={onLogin}>
+              <Button variant="ghost" onClick={handleLogin}>
                 Login
               </Button>
-              <Button onClick={onSignup}>Sign up</Button>
+              <Button onClick={handleSignup}>Sign up</Button>
             </div>
           )}
         </div>
       </div>
+
+      <AuthModal
+        isOpen={showAuth}
+        onClose={() => setShowAuth(false)}
+        defaultTab={authDefaultTab}
+      />
     </header>
   );
 };
