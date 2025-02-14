@@ -2,10 +2,20 @@
   command = "npm run build"
   publish = "dist"
 
-[build.environment]
-  SECRETS_SCAN_OMIT_KEYS = "VITE_SUPABASE_ANON_KEY,VITE_SUPABASE_URL,VITE_GOOGLE_MAPS_API_KEY"
-
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+
+[build.environment]
+  SECRETS_SCAN_OMIT_KEYS = "VITE_*"
+
+# These environment variables are meant to be public
+[context.production.environment]
+  SECRETS_SCAN_OMIT_KEYS = "VITE_*"
+
+[context.deploy-preview.environment]
+  SECRETS_SCAN_OMIT_KEYS = "VITE_*"
+
+[context.branch-deploy.environment]
+  SECRETS_SCAN_OMIT_KEYS = "VITE_*"
