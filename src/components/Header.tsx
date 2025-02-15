@@ -96,7 +96,10 @@ const Header = ({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem className="cursor-pointer">
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={() => navigate(`/profile/${user.id}`)}
+                >
                   Profile
                 </DropdownMenuItem>
                 <DropdownMenuItem

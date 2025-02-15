@@ -5,6 +5,7 @@ import SearchResults from "./components/SearchResults";
 import LoginPage from "./pages/auth/login";
 import SignupPage from "./pages/auth/signup";
 import SettingsPage from "./pages/settings";
+import ProfilePage from "./pages/profile/[id]";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import routes from "tempo-routes";
 
@@ -25,6 +26,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/profile/:id" element={<ProfilePage />} />
         </Routes>
         {import.meta.env.VITE_TEMPO === "true" && useRoutes(routes)}
       </>

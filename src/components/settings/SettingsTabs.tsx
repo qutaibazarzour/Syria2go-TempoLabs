@@ -22,20 +22,13 @@ export default function SettingsTabs({
         onValueChange={onTabChange}
         className="space-y-6"
       >
-        <TabsList className="grid w-full grid-cols-3 lg:w-[400px]">
+        <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
           <TabsTrigger value="personal">Personal Info</TabsTrigger>
-          <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="security">Security</TabsTrigger>
         </TabsList>
 
         <TabsContent value="personal" className="mt-6">
           <PersonalInfoForm />
-        </TabsContent>
-
-        <TabsContent value="profile" className="mt-6">
-          <Suspense fallback={<ProfileFormSkeleton />}>
-            <ProfileForm />
-          </Suspense>
         </TabsContent>
 
         <TabsContent value="security" className="mt-6">
