@@ -25,6 +25,9 @@ interface SecurityFormProps {
   }>;
 }
 
+import { updateUserProfile } from "@/services/user";
+import { useAuth } from "@/lib/auth";
+
 const SecurityForm = ({
   onPasswordUpdate = () => {},
   onDisconnectSocial = () => {},

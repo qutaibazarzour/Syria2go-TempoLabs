@@ -1,4 +1,6 @@
 import React from "react";
+import { useAuth } from "@/lib/auth";
+import { updateUserProfile } from "@/services/user";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -39,8 +41,23 @@ export default function PersonalInfoForm({
     defaultValues: initialData,
   });
 
-  const handleFormSubmit = (data: PersonalInfoFormData) => {
-    onSubmit?.(data);
+  const { user } = useAuth();
+  const handleFormSubmit = async (data: PersonalInfoFormData) => {
+    if (!user?.id) return;
+
+    const updated = await updateUserProfile(user.id, {
+      legal_name: data.legalName,
+      email: data.email,
+      phone: data.phone,
+      address: data.address,
+      emergency_contact_name: data.emergencyContactName,
+      emergency_contact_phone: data.emergencyContactPhone,
+      emergency_contact_relation: data.emergencyContactRelation,
+    });
+
+    if (updated) {
+      onSubmit?.(data);
+    }
   };
 
   return (

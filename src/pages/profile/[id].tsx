@@ -14,9 +14,12 @@ import MobileNav from "@/components/MobileNav";
 import PropertyCard from "@/components/PropertyCard";
 import ProfileForm from "@/components/settings/ProfileForm";
 
+import { useNavigate } from "react-router-dom";
+
 export default function ProfilePage() {
   const { id } = useParams();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);

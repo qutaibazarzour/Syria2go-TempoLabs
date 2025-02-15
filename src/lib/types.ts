@@ -17,4 +17,14 @@ export type UserProfile = Database["public"]["Tables"]["users"]["Row"] & {
   verifications?: UserVerification;
   reviews?: Review[];
   properties?: PropertyWithImages[];
+  username?: string;
+  photo_url?: string;
+  about_intro?: string;
+  languages?: string[];
+  legal_name?: string;
+  phone?: string;
+  address?: string;
+  emergency_contact_name?: string;
+  emergency_contact_phone?: string;
+  emergency_contact_relation?: string;
 };

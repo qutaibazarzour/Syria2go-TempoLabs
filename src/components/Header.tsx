@@ -86,11 +86,18 @@ const Header = ({
                 >
                   <Avatar>
                     <AvatarImage
-                      src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`}
-                      alt={user.email || "User"}
+                      src={
+                        user.photo_url ||
+                        `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`
+                      }
+                      alt={user.username || user.email || "User"}
                     />
                     <AvatarFallback>
-                      {user.email?.[0].toUpperCase()}
+                      {(
+                        user.username?.[0] ||
+                        user.email?.[0] ||
+                        "U"
+                      ).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                 </Button>
@@ -98,7 +105,7 @@ const Header = ({
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuItem
                   className="cursor-pointer"
-                  onClick={() => navigate(`/profile/${user.id}`)}
+                  onClick={() => user?.id && navigate(`/profile/${user.id}`)}
                 >
                   Profile
                 </DropdownMenuItem>

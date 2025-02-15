@@ -81,8 +81,13 @@ const ProfileForm = ({
 
     setIsSaving(true);
     try {
-      const success = await updateUserProfile(user.id, formData);
-      if (success) {
+      const updated = await updateUserProfile(user.id, {
+        username: formData.username,
+        photo_url: formData.photo_url,
+        about_intro: formData.about_intro,
+        languages: formData.languages,
+      });
+      if (updated) {
         setIsEditing(false);
       }
     } catch (error) {
