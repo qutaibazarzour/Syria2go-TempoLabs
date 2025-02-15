@@ -1,7 +1,9 @@
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PersonalInfoForm from "./PersonalInfoForm";
-import ProfileForm from "./ProfileForm";
+import { lazy, Suspense } from "react";
+import ProfileFormSkeleton from "./ProfileFormSkeleton";
+const ProfileForm = lazy(() => import("./ProfileForm"));
 import SecurityForm from "./SecurityForm";
 
 interface SettingsTabsProps {
@@ -31,7 +33,9 @@ export default function SettingsTabs({
         </TabsContent>
 
         <TabsContent value="profile" className="mt-6">
-          <ProfileForm />
+          <Suspense fallback={<ProfileFormSkeleton />}>
+            <ProfileForm />
+          </Suspense>
         </TabsContent>
 
         <TabsContent value="security" className="mt-6">
